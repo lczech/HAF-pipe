@@ -85,12 +85,15 @@ fi
 echo "making snptable for chrom $chrom from $vcf, starting from column $firstSampleCol"
 maindir=$(dirname $0)/..
 
+# In the following, we use gunzip instead of zcat, for portability with MacOS,
+# see https://serverfault.com/a/704521 for details.
+
 ##PRINT HEADER
-zcat -f $vcf | head -1000  | grep "#CHROM" | head -1 | \
+gunzip -c $vcf | head -1000  | grep "#CHROM" | head -1 | \
 awk -v fsc=$firstSampleCol '{for(i=fsc;i<=NF;i++){printf $i","}}' | \
 sed "s/^/${chrom},Ref,/" | sed 's/,$/\n/' > $snptable
 
-zcat -f $vcf | grep -P '^'$chrom'\t' | \
+gunzip -c $vcf | grep -P '^'$chrom'\t' | \
 awk -v fsc="$firstSampleCol" -v mincalls="$mincalls" -v keephets="$keephets" '
 BEGIN{
     baseCodes["AG"]="R";baseCodes["GA"]="R"
