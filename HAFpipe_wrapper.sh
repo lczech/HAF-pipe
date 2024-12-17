@@ -49,8 +49,8 @@ usage()
         [ -r --refseq ]     reference sequence; tasks:3
 
         [ -e --encoding ]   base quality encoding in bam files; tasks:3
-                            #'illumina' (default)
-                            #'sanger'
+                            #'sanger' (default if it cannot be inferred)
+                            #'illumina'
 
         [ -g --generations ] number of generations of recombination; used to calculate window size for haplotype inference; tasks=3
 
@@ -104,7 +104,7 @@ snptable=""
 nsites=20
 bamfile=""
 refseq=""
-encoding="illumina"
+encoding="default"
 winsize=""
 recombrate=.0000000239
 quantile=18
