@@ -99,15 +99,40 @@ if [ -z "$bamfile" ] || [ -z "$snptable" ] || [ -z "$refseq" ] ; then
     exit 1
 fi
 
+# ==================================================================================================
+#      Fix Locale
+# ==================================================================================================
+
+# On some cluster nodes, it seems that the locale is not properly set,
+# and causes harp to fail with error message:
+#     locale::facet::_S_create_c_locale name not valid
+# We fix this by manually resetting it for the scope of this script.
+OS=$(uname)
+if [[ "$OS" == "Linux" ]]; then
+    # Linux-specific locale settings
+    export LC_ALL=C.UTF-8
+    export LANG=C.UTF-8
+    echo "Locale set for Linux: $LC_ALL"
+elif [[ "$OS" == "Darwin" ]]; then
+    # macOS-specific locale settings
+    export LC_ALL=en_US.UTF-8
+    export LANG=en_US.UTF-8
+    echo "Locale set for macOS: $LC_ALL"
+else
+    echo "Unknown OS: $OS. Defaulting to C locale."
+    export LC_ALL=C
+    export LANG=C
+fi
+
+# ==================================================================================================
+#      Main
+# ==================================================================================================
+
 echo -e "********\ninferring haplotype freqs for \n[ $bamfile ]\n
 using haplotypes in \n[ $snptable ]\n
 with ${wins}kb windows and $encoding base quality encoding\n*********"
 if [ -z "$outdir" ]; then outdir=$(dirname $bamfile); fi
 if [ ! -f ${snptable}.idx ]; then  ${maindir}/scripts/index_snp_table $snptable 50000; fi
-
-# ==================================================================================================
-#      Main
-# ==================================================================================================
 
 outfile=$outdir/$(basename $bamfile)
 
