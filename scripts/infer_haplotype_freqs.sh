@@ -131,15 +131,17 @@ do
     if [ $stop -gt ${chrEnd} ]; then stop=${chrEnd}; fi
 
     ### run harp like
+    echo "******** run harp like ${chrom}:${start}-${stop}"
     harp like \
     -b $bamfile \
     --refseq $refseq \
     --snps $snptable \
     -r ${chrom}:${start}-${stop} \
     --stem ${outfile}.${chrom}_${start}_${stop} \
-    $(echo $encoding | awk '($0=="illumina"){print "-I"}')  >/dev/null 2> /dev/null
+    $(echo $encoding | awk '($0=="illumina"){print "-I"}') # >/dev/null 2> /dev/null
 
     ### run harp freq
+    echo "******** run harp freq ${chrom}:${start}-${stop}"
     harp freq \
     -b $bamfile \
     --refseq $refseq \
@@ -148,7 +150,7 @@ do
     --stem ${outfile}.${chrom}_${start}_${stop} \
     --window_step $freqstep \
     --window_width $freqwindow \
-    $(echo $encoding | awk '($0=="illumina"){print "-I"}')  >/dev/null 2> /dev/null
+    $(echo $encoding | awk '($0=="illumina"){print "-I"}') # >/dev/null 2> /dev/null
 
     ## CLEAN UP
     rm -r ${outfile}.${chrom}_${start}_${stop}.output
@@ -157,6 +159,7 @@ do
 done
 
 ## CAT AND SORT HAPLOTYPE FREQUENCIES FROM ALL WINDOWS
+echo "********"
 cat ${outfile}.${chrom}_*.freqs | tr ' ' '\t' | sort -k2g | tr '\t' ' ' > ${outfile}.${chrom}.freqs
 rm ${outfile}.${chrom}_*.freqs
 echo "harp freqs written to ${outfile}.${chrom}.freqs"
